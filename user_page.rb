@@ -1,13 +1,14 @@
 require 'tk'
 require 'tkextlib/tile'
 # require_relative "user"
+# require_relative "post"
 
 
 class UserPage < TkFrame
 
   def initialize(parent, user_manager, user_id)
     super(parent)
-    @user = user_manager.getUser(user_id)
+    # @user = user_manager.getUser(user_id)
 
     outer_self = self
 
@@ -68,12 +69,54 @@ class UserPage < TkFrame
       end
     end
 
+    # create post
+    create_post_btn = TkButton.new(self) do
+      text 'Create Post'
+      grid(:row => 4, :column=> 0)
+      command do
+        popup = TkToplevel.new(root) { title "Enter Post Details" }
+        popup.geometry("250x150")
 
-    # manage posts
-      # add, remove, update, add/remove attachments
-      # view total posts
+        # Name label and entry
+        TkLabel.new(popup) { text "Title:"; pack('anchor' => 'w', 'padx' => 10, 'pady' => 5) }
+        title_entry = TkEntry.new(popup, 'textvariable' => name_var)
+        title_entry.pack('padx' => 10, 'pady' => 2)
 
-    
+        # Age label and entry
+        TkLabel.new(popup) { text "Content:"; pack('anchor' => 'w', 'padx' => 10, 'pady' => 5) }
+        content_entry = TkEntry.new(popup, 'textvariable' => age_var)
+        content_entry.pack('padx' => 10, 'pady' => 2)
+
+        # Submit button
+        TkButton.new(popup) do
+          text "Submit"
+          pack('pady' => 10)
+          command do
+            post = Post.new(title_entry.value, content_entry.value)
+            @user.createPost(post)
+            popup.destroy # Close the pop-up
+          end
+        end
+
+        # Need to update the post list. update post list should probbaly be a function
+      end
+    end
+
+    post_frame = TkFrame.new(outer_self)
+    TkLabel.new(post_frame){text "Title"}.grid(:row => 0, :column => 0)
+    TkLabel.new(post_frame){text "Content"}.grid(:row => 0, :column => 1)
+
+    @user.posts.each_with_index(1) do |post, index|
+      TkLabel.new(post_frame){text post.title}.grid(:row => index, :column => 0)
+      TkLabel.new(post_frame){text post.content}.grid(:row => index, :column => 1)
+      # TkButton.new(post_frame){text "Delete", command {@user.deletePost(post.postID)}}.grid(:row => index, :column => 0)
+      TkButton.new(post_frame){text "Delete", command {puts "Deleting post"}}.grid(:row => index, :column => 0)
+      TkButton.new(post_frame){text "edit", command {puts "Editing post"}}.grid(:row => index, :column => 0)
+
+    end
+
+    post_frame.grid(:row => 5, :column => 0)
+
     # export posts?
     # create top level that looks
 
