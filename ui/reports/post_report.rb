@@ -3,7 +3,7 @@ module CustomReports
         total_attachments = 0
         for user in users  # TODO: ensure post attributes are correct - especially post.attachments!
             for post in user.posts
-                table_contents += "<tr><td>#{post.id}</td><td>#{post.title}</td><td>#{post.created_date}</td><td>#{post.updated_date}</td><td>#{post.attachments}</td><td>#{post.attachments.length}</tr>"
+                table_contents += "<tr><td>#{post.postID}</td><td>#{post.title}</td><td>#{post.createdAt}</td><td>#{post.updatedAt}</td><td>#{post.attachments.map(&:fileName).join(', ')}</td><td>#{post.attachments.length}</tr>"
                 total_attachments += post.attachments.length
             end
         end

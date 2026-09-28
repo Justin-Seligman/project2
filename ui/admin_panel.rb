@@ -32,12 +32,18 @@ class AdminPanel < TkFrame
     end
 
 
-    def initialize(parent)
+    def initialize(parent, user_manager)
         super(parent)
 
-        @user_manager = UserManager.new
+        @user_manager = user_manager
         admin = "Eric"
 
+        self.grid(
+            "row" => 0,
+            "column" => 0,
+            "sticky" => "nsew"
+        )
+        
         # Title
         TkLabel.new(
             self,
@@ -390,7 +396,6 @@ class AdminPanel < TkFrame
                 )
 
             end
-
         end
 
 
@@ -708,37 +713,3 @@ class AdminPanel < TkFrame
         )
     end
 end
-
-
-# -------------------------
-# Main Application
-# -------------------------
-
-root = TkRoot.new {
-    title "Admin Panel"
-}
-
-root.geometry("300x400")
-
-
-panel = AdminPanel.new(root)
-
-panel.grid(
-    "row" => 0,
-    "column" => 0,
-    "sticky" => "nsew"
-)
-
-
-root.grid_rowconfigure(
-    0,
-    'weight' => 1
-)
-
-root.grid_columnconfigure(
-    0,
-    'weight' => 1
-)
-
-
-Tk.mainloop
