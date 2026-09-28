@@ -1,8 +1,8 @@
 require "tk"
 require_relative "../user_manager"
-require_relative "master_report"
-require_relative "post_report"
-require_relative "user_report"
+require_relative "reports/master_report"
+require_relative "reports/post_report"
+require_relative "reports/user_report"
 
 
 # TODO: Validate input when managing users - check with Nolan to see if login functions can be reused
@@ -242,18 +242,6 @@ class AdminPanel < TkFrame
                     return
                 end
 
-
-                # Duplicate email check
-                if @user_manager.get_user_by_email(email_value)
-
-                    status.configure(
-                        text: "User already exists."
-                    )
-
-                    return
-                end
-
-
                 # Create user
                 user = User.new(
                     username_value,
@@ -261,12 +249,14 @@ class AdminPanel < TkFrame
                     password_value
                 )
 
-                @user_manager.create_user(user)
-
+                success = @user_manager.create_user(user)
+                
 
                 status.configure(
-                    text: "Created user #{user.id}: #{user.email}"
-                )
+                    text: success ?
+                        "Created user #{user.user_id}" :
+                        "Create failed."
+                    )
 
 
                 # Clear fields
@@ -513,7 +503,7 @@ class AdminPanel < TkFrame
 
                     results.insert(
                         'end',
-                        "#{user.id} | #{user.username} | #{user.email}"
+                        "#{user.user_id} | #{user.username} | #{user.email}"
                     )
 
                 end
@@ -580,7 +570,7 @@ class AdminPanel < TkFrame
 
             listbox.insert(
                 'end',
-                "#{user.id} | #{user.username} | #{user.email}"
+                "#{user.user_id} | #{user.username} | #{user.email}"
             )
 
         end

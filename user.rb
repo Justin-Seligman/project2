@@ -3,12 +3,12 @@ require "digest"
 
 class User
 	attr_accessor :username, :email, :posts
-	attr_reader :id  # ID needs to be read by user_manager
+	attr_reader :user_id  # ID needs to be read by user_manager
 	@@next_id = 1
 
 	def initialize(username, email, password)
 		@username = username
-		@id = @@next_id
+		@user_id = @@next_id
 		@@next_id += 1
 		@email = email
 		@password = Digest::SHA256.hexdigest(password)

@@ -97,7 +97,7 @@ module CustomReports
             <table class='metadata'>
                 <tr>
                     <td class='meta-cell'>User ID</td>
-                    <td>#{user.id}</td>
+                    <td>#{user.user_id}</td>
                     <td class= 'meta-cell'>Admin</td>
                     <td>#{admin}</td>
                 </tr>

@@ -7,8 +7,18 @@ class UserManager
 		@users = {}  # ID | User
 	end
 
+	def attempt_login(email, password)
+		user = get_user_by_email(email)
+		if user && user.login(email, password)
+			return user.user_id
+		end
+		false
+	end
+
+
 	def create_user(user)
-		@users[user.id] = user
+		return false if self.get_user_by_email(user.email)
+		@users[user.user_id] = user
 	end
 
 	def get_user_by_id(user_id)
@@ -20,7 +30,7 @@ class UserManager
 	end
 
 	def update_user(user)
-		@users[user.id] = user
+		@users[user.user_id] = user
 	end
 
 	def delete_user(user_id)
