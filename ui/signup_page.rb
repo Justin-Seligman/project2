@@ -5,6 +5,8 @@ require_relative 'user_page'
 require_relative '../user_manager'
 require_relative 'login_page'
 
+# TODO: Make Address field pop-up
+
 class SignupPageFrame < TkFrame
 
   def initialize(parent, user_manager)
