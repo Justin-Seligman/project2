@@ -1,9 +1,10 @@
 module CustomReports
     def self.generate_post_report(users)
         total_attachments = 0
+        table_contents = ""
         for user in users  # TODO: ensure post attributes are correct - especially post.attachments!
             for post in user.posts
-                table_contents += "<tr><td>#{post.postID}</td><td>#{post.title}</td><td>#{post.createdAt}</td><td>#{post.updatedAt}</td><td>#{post.attachments.map(&:fileName).join(', ')}</td><td>#{post.attachments.length}</tr>"
+                table_contents += "<tr><td>#{post.post_id}</td><td>#{post.title}</td><td>#{post.createdAt}</td><td>#{post.updatedAt}</td><td>#{post.attachmentsNamesArray.join(', ')}</td><td>#{post.attachments.length}</tr>"
                 total_attachments += post.attachments.length
             end
         end

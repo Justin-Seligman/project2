@@ -58,8 +58,8 @@ class UserManager
 	def attachment_count
 		acount = 0
 		@users.values.each do |user|
-			for post in user.post
-				acount += user.post.attachments.length 
+			for post in user.posts
+				acount += post.attachments.length 
 			end
 		end
 		acount
