@@ -1,6 +1,6 @@
-class Address
+require_relative "user"
 
-  require_relative User
+class Address
 
   attr_accessor :street, :city, :state, :zipCode
   def initialize(street, city, state, zipCode)

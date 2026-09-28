@@ -3,9 +3,10 @@ require_relative "post"
 require_relative "address"
 
 class User
-	attr_accessor :first_name, :last_name, :email, :posts
+	attr_accessor :username, :email, :posts, :address
 	attr_reader :user_id  # ID needs to be read by user_manager
 	@@next_id = 1
+	@@current_users = 0
 
 	def initialize(username, email, password)
 		@username = username
@@ -22,12 +23,13 @@ class User
 		return false if email != @email || Digest::SHA256.hexdigest(password) != @password
 
 		@logged_in = 1
-		@current_users += 1
+		@@current_users += 1
 		return true
 	end
 
 	def logout()
 		@logged_in = 0
+		@@current_users -= 1
 	end
 
   	def create_post(post)

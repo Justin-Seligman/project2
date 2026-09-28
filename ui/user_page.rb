@@ -1,14 +1,14 @@
 require 'tk'
 require 'tkextlib/tile'
-require_relative "user"
-require_relative "post"
+require_relative "../user"
+require_relative "../post"
 
 
 class UserPage < TkFrame
 
   def initialize(parent, user_manager, user_id)
     super(parent)
-    @user = user_manager.get_user(user_id)
+    @user = user_manager.get_user_by_id(user_id)
 
     puts "user #{user_id} is #{@user.class}"
 

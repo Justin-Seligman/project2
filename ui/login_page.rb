@@ -1,7 +1,7 @@
 require 'tk'
 require 'tkextlib/tile'
 require_relative 'user_page'
-require_relative 'user_manager'
+require_relative '../user_manager'
 
 class LoginPageFrame < TkFrame
 
@@ -33,11 +33,11 @@ class LoginPageFrame < TkFrame
         # Add authentication logic here
         user_id = user_manager.attempt_login(email, password)
         if user_id != false
-          self.grid_forget()
+          outer_self.grid_forget()
           user_page = UserPage.new(parent, user_manager, user_id).grid(:row => 0, :column=> 0)
           user_page.bind('Destroy') do |e|
-            if e.target == user_page
-              self.grid(:row => 0, :column => 0)
+            if e.widget == user_page
+              outer_self.grid(:row => 0, :column => 0)
             end
           end
         else
@@ -47,7 +47,6 @@ class LoginPageFrame < TkFrame
             pack padx: 20, pady: 20
           end
         end
-        puts "Logging in with username: #{username} password: #{password}"
       end
     end
 
