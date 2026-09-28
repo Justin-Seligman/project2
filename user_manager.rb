@@ -37,6 +37,24 @@ class UserManager
 		@users.length
 	end
 
+	def post_count
+		pcount = 0
+		@users.values.each do |user|
+			pcount += user.posts.length
+		end
+		return pcount
+	end
+
+	def attachment_count
+		acount = 0
+		@users.values.each do |user|
+			for post in user.post
+				acount += user.post.attachments.length 
+			end
+		end
+		acount
+	end
+
 	def deleted_user_count
 		@@deleted_users
 	end

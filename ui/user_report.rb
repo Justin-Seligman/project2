@@ -1,5 +1,5 @@
-module Reports
-    def generate_user_detail_report(user)
+module CustomReports
+    def self.generate_user_detail_report(user)
         for post in user.posts  # TODO: ensure attributes are correct
             table_contents += "<tr><td>#{post.id}</td><td>#{post.title}</td><td>#{post.created_date}</td><td>#{post.updated_date.address}</td></tr>"
         end

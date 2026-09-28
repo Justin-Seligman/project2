@@ -1,7 +1,7 @@
 require "time"
 
-module Reports
-    def generate_master_report(users, admin)
+module CustomReports
+    def self.generate_master_report(users, admin)
         for user in users  # TODO: ensure user address and other attributes are correct
             table_contents += "<tr><td>#{user.id}</td><td>#{user.name}</td><td>#{user.email}</td><td>#{user.address}</td><td>#{user.posts}</td></tr>"
         end

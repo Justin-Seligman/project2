@@ -1,5 +1,5 @@
-module Reports
-    def generate_post_report(users)
+module CustomReports
+    def self.generate_post_report(users)
         total_attachments = 0
         for user in users  # TODO: ensure post attributes are correct - especially post.attachments!
             for post in user.posts

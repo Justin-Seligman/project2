@@ -6,12 +6,15 @@ require_relative "user_report"
 
 
 # TODO: Validate input when managing users - check with Nolan to see if login functions can be reused
-# TODO: Update dashboard look and fill in parameters
+# TODO: implement recent post/user created
+# TODO: Update dashboard look
 # TODO: Confirm all parameters are valid when merging with backend
-# TODO: link buttons to generate reports
+# TODO: need to know the admin that's "logged in" for the master report?
+
 
 class AdminPanel < TkFrame
-
+    include CustomReports
+    
     class TextBox < TkLabel
         def initialize(parent, custom_text)
             super(parent)
@@ -33,6 +36,7 @@ class AdminPanel < TkFrame
         super(parent)
 
         @user_manager = UserManager.new
+        admin = "Eric"
 
         # Title
         TkLabel.new(
@@ -92,7 +96,7 @@ class AdminPanel < TkFrame
         # Dashboard
         TkButton.new(
             self,
-            text: "View Dashboard",
+            text: "View Statistics",
             command: proc { open_dashboard }
         ).grid(
             'row' => 4,
@@ -102,6 +106,30 @@ class AdminPanel < TkFrame
             'sticky' => 'ew'
         )
 
+        TkButton.new(
+            self,
+            text: "Generate Master Report",
+            command: proc { CustomReports::generate_master_report(@user_manager.get_all_users, admin)}
+        ).grid(
+            'row' => 5,
+            'column' => 0,
+            'padx' => 20,
+            'pady' => 10,
+            'sticky' => 'ew'
+        )
+
+
+        TkButton.new(
+            self,
+            text: "Generate Post Report",
+            command: proc { CustomReports::generate_post_report(@user_manager.get_all_users)}
+        ).grid(
+            'row' => 6,
+            'column' => 0,
+            'padx' => 20,
+            'pady' => 10,
+            'sticky' => 'ew'
+        )
 
         # Allow buttons to expand horizontally
         grid_columnconfigure(0, 'weight' => 1)
@@ -391,7 +419,7 @@ class AdminPanel < TkFrame
     def open_search_window
         window = TkToplevel.new(self)
         window.title = "Search Users"
-        window.geometry("420x260")
+        window.geometry("420x400")
 
 
         query = TkEntry.new(
@@ -420,6 +448,44 @@ class AdminPanel < TkFrame
             pady: 10
         )
 
+        TkButton.new(
+            window,
+            text: "Generate Report for Selected User",
+            anchor: "w",
+            command: proc { 
+                selected = results.curselection
+
+
+                if selected.empty?
+
+                    status.configure(
+                        text: "Select a user to generate a report for."
+                    )
+
+                    return
+                end
+
+
+                selected_value = results.get(selected[0])
+
+                user_id = selected_value.split('|').first.to_i
+
+                selected_user = @user_manager.get_user_by_id(user_id)
+                
+                report = CustomReports::generate_user_detail_report(selected_user)
+
+                status.configure(
+                    text: report ?
+                        "Generated Report for #{user_id}" :
+                        "Report Failed."
+                )
+            }
+        ).grid(
+            row: 1,
+            column: 0,
+            padx: 10,
+            pady: 10
+        )
 
         # Search button
         TkButton.new(
@@ -470,7 +536,7 @@ class AdminPanel < TkFrame
 
         # Results
         results.grid(
-            row: 1,
+            row: 2,
             column: 0,
             columnspan: 2,
             padx: 10,
@@ -481,7 +547,7 @@ class AdminPanel < TkFrame
 
         # Status
         status.grid(
-            row: 2,
+            row: 3,
             column: 0,
             columnspan: 2,
             sticky: 'ew',
@@ -491,7 +557,7 @@ class AdminPanel < TkFrame
 
 
         window.grid_rowconfigure(
-            1,
+            2,
             'weight' => 1
         )
 
@@ -549,7 +615,7 @@ class AdminPanel < TkFrame
 
         total_posts = TextBox.new(
             window,
-            "Total Posts: #{000}"
+            "Total Posts: #{@user_manager.post_count}"
         )
 
         total_posts.grid(
@@ -563,7 +629,7 @@ class AdminPanel < TkFrame
 
         total_attachments = TextBox.new(
             window,
-            "Total Attachments: #{000}"
+            "Total Attachments: #{@user_manager.attachment_count}"
         )
 
         total_attachments.grid(
@@ -662,7 +728,7 @@ root = TkRoot.new {
     title "Admin Panel"
 }
 
-root.geometry("300x300")
+root.geometry("300x400")
 
 
 panel = AdminPanel.new(root)
