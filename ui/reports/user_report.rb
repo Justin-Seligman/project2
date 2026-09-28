@@ -1,7 +1,8 @@
 module CustomReports
     def self.generate_user_detail_report(user)
+        table_contents = ""
         for post in user.posts  # TODO: ensure attributes are correct
-            table_contents += "<tr><td>#{post.id}</td><td>#{post.title}</td><td>#{post.created_date}</td><td>#{post.updated_date.address}</td></tr>"
+            table_contents += "<tr><td>#{post.post_id}</td><td>#{post.title}</td><td>#{post.createdAt}</td><td>#{post.updatedAt}</td></tr>"
         end
 
         html_content = 
@@ -98,8 +99,8 @@ module CustomReports
                 <tr>
                     <td class='meta-cell'>User ID</td>
                     <td>#{user.user_id}</td>
-                    <td class= 'meta-cell'>Admin</td>
-                    <td>#{admin}</td>
+                    <td class= 'meta-cell'>Username</td>
+                    <td>#{user.username}</td>
                 </tr>
                 <tr>
                 	<td class='meta-cell'>Email</td>

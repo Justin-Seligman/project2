@@ -34,4 +34,8 @@ class Post
         @attachments.reject{|x| x.attachmentId = attachmentId}
     end
 
+    def attachmentsNamesArray
+        return Array(@attachments.map(&:fileName))
+    end
+
 end

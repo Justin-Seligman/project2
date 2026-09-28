@@ -385,14 +385,14 @@ class AdminPanel < TkFrame
             sticky: 'nsew'
         )
 
+        posts.insert('end', "Username -> Post ID | Post Title | Post Content | Created At | Updated At | Attachment Names ")
 
         @user_manager.get_all_users.each do |user|
 
             user.posts.each do |post|
 
                 posts.insert(
-                    'end',
-                    "#{user.email} -> #{post[:title]}"
+                    'end', "#{user.username} -> #{post.post_id} | #{post.title} | #{post.content} | #{post.createdAt} | #{post.updatedAt} | #{post.attachmentsNamesArray.join(", ") || "None"}"
                 )
 
             end

@@ -2,8 +2,9 @@ require "time"
 
 module CustomReports
     def self.generate_master_report(users, admin)
-        for user in users  # TODO: ensure user address and other attributes are correct
-            table_contents += "<tr><td>#{user.id}</td><td>#{user.name}</td><td>#{user.email}</td><td>#{user.address}</td><td>#{user.posts}</td></tr>"
+        table_contents = ""
+        for user in users
+            table_contents += "<tr><td>#{user.user_id}</td><td>#{user.username}</td><td>#{user.email}</td><td>#{user.address&.getFullAddress}</td><td>#{Array(user.posts).length}</td></tr>"
         end
 
         date = Time.now()
