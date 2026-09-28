@@ -1,10 +1,12 @@
 class Post
 
+	attr_accessor :post_id, :title, :content, :createdAt, :updatedAt, :attachments
+
     # Static (attached to class object instance)
     @@nextPostId = 1
 
     def initialize(title, content)
-        @postId = @@nextPostId
+        @post_id = @@nextPostId
         @@nextPostId += 1
         @title = title
         @content = content
