@@ -6,12 +6,12 @@ class UserManager
 	end
 	
 	def create_user(user)
-		@users[user.id] = user
+		@users[user.user_id] = user
 	end
 
 	def get_user(user_id)
 		user = @users[user_id]
-		return false unless user	
+		return user || false	
 	end
 
 	def update_user(user)

@@ -31,14 +31,22 @@ class LoginPageFrame < TkFrame
         email = email_entry.value
         password = pass_entry.value
         # Add authentication logic here
-        # if credentials are correct
-        # self.grid_forget()
-        # user_page = UserPage.new(parent, username).grid(:row => 0, :column=> 0)
-        # user_page.bind('Destroy') do |e|
-        #   if e.target == user_page
-        #     self.grid(:row => 0, :column => 0)
-        #   end
-        # end
+        user_id = user_manager.attempt_login(email, password)
+        if user_id != false
+          self.grid_forget()
+          user_page = UserPage.new(parent, user_manager, user_id).grid(:row => 0, :column=> 0)
+          user_page.bind('Destroy') do |e|
+            if e.target == user_page
+              self.grid(:row => 0, :column => 0)
+            end
+          end
+        else
+          popup = TkToplevel.new(root) { title "log-in" }
+          label = TkLabel.new(popup) do
+            text "Log In failed, try again!"
+            pack padx: 20, pady: 20
+          end
+        end
         puts "Logging in with username: #{username} password: #{password}"
       end
     end

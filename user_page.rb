@@ -1,14 +1,16 @@
 require 'tk'
 require 'tkextlib/tile'
-# require_relative "user"
-# require_relative "post"
+require_relative "user"
+require_relative "post"
 
 
 class UserPage < TkFrame
 
   def initialize(parent, user_manager, user_id)
     super(parent)
-    # @user = user_manager.getUser(user_id)
+    @user = user_manager.get_user(user_id)
+
+    puts "user #{user_id} is #{@user.class}"
 
     outer_self = self
 
@@ -23,21 +25,21 @@ class UserPage < TkFrame
     end
 
     street_label = TkLabel.new(self){text 'Street:'}.grid(:row => 1, :column => 0)
-    # street_entry = TkEntry.new(self).insert(0,@user.address.street).grid(:row => 1, :column => 1)
-    street_entry = TkEntry.new(self).insert(0, 'placeholder street').grid(:row => 1, :column => 1)
+    street_entry = TkEntry.new(self).insert(0,@user.address.street).grid(:row => 1, :column => 1)
+    # street_entry = TkEntry.new(self).insert(0, 'placeholder street').grid(:row => 1, :column => 1)
 
     city_label = TkLabel.new(self){text 'City:'}.grid(:row => 1, :column => 2)
-    # city_entry = TkEntry.new(self).insert(0,@user.address.city).grid(:row => 1, :column => 3)
-    city_entry = TkEntry.new(self).insert(0, "placeholder city").grid(:row => 1, :column => 3)
+    city_entry = TkEntry.new(self).insert(0,@user.address.city).grid(:row => 1, :column => 3)
+    # city_entry = TkEntry.new(self).insert(0, "placeholder city").grid(:row => 1, :column => 3)
 
     state_label = TkLabel.new(self){text 'State:'}.grid(:row => 1, :column => 4)
-    # street_entry = TkEntry.new(self).insert(0, @user.address.state).grid(:row => 1, :column => 5)
-    state_entry = TkEntry.new(self).insert(0, 'placeholder state').grid(:row => 1, :column => 5)
+    street_entry = TkEntry.new(self).insert(0, @user.address.state).grid(:row => 1, :column => 5)
+    # state_entry = TkEntry.new(self).insert(0, 'placeholder state').grid(:row => 1, :column => 5)
 
     zipcode_label = TkLabel.new(self){text 'Zip Code:'}.grid(:row => 1, :column => 6)
     # TODO: Check why this is camel case in the uml diagram and not snake case
-    # street_entry = TkEntry.new(self).insert(0, @user.address.zipCode).grid(:row => 1, :column => 7)
-    zipcode_entry = TkEntry.new(self).insert(0,'placeholder zipcode').grid(:row => 1, :column => 7)
+    street_entry = TkEntry.new(self).insert(0, @user.address.zipCode).grid(:row => 1, :column => 7)
+    # zipcode_entry = TkEntry.new(self).insert(0,'placeholder zipcode').grid(:row => 1, :column => 7)
 
     # TODO: Validate addres
     save_address_btn = TkButton.new(self) do
@@ -63,7 +65,7 @@ class UserPage < TkFrame
       text 'Delete Account'
       grid(:row => 3, :column=> 0)
       command do
-        user_manager.deleteUser(user_id)
+        user_manager.delete_user(user_id)
         outer_self.destroy
 
       end
@@ -106,7 +108,7 @@ class UserPage < TkFrame
     TkLabel.new(post_frame){text "Title"}.grid(:row => 0, :column => 0)
     TkLabel.new(post_frame){text "Content"}.grid(:row => 0, :column => 1)
 
-    @user.posts.each_with_index(1) do |post, index|
+    @user.posts.each.with_index(1) do |post, index|
       TkLabel.new(post_frame){text post.title}.grid(:row => index, :column => 0)
       TkLabel.new(post_frame){text post.content}.grid(:row => index, :column => 1)
       # TkButton.new(post_frame){text "Delete", command {@user.deletePost(post.postID)}}.grid(:row => index, :column => 0)

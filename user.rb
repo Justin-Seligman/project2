@@ -1,9 +1,10 @@
 require "digest"
 require_relative "post"
+require_relative "address"
 
 class User
 	attr_accessor :first_name, :last_name, :email, :posts
-	attr_reader :id  # ID needs to be read by user_manager
+	attr_reader :user_id  # ID needs to be read by user_manager
 	@@next_id = 1
 
 	def initialize(username, email, password)
@@ -14,6 +15,7 @@ class User
 		@password = Digest::SHA256.hexdigest(password)
 		@logged_in = 0
 		@posts = []
+		@address = Address.new("", "", "", "")
 	end 
 
 	def login(email, password)

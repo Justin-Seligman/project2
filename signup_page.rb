@@ -1,5 +1,6 @@
 require 'tk'
 require 'tkextlib/tile'
+require_relative 'user'
 require_relative 'user_page'
 require_relative 'user_manager'
 require_relative 'login_page'
@@ -36,17 +37,28 @@ class SignupPageFrame < TkFrame
       command do
         username = user_entry.value
         password = pass_entry.value
-        puts "signing up with username: #{username} password: #{password}"
+        email = email_entry.value
+        user = User.new(username, email, password)
+        if user_manager.create_user(user)
+          puts "signing up with email: #{email} username: #{username} password: #{password}"
 
-        outer_self.grid_forget()
-        # TODO: Make it pass the actual user id
-        # pass the created user to usermanager too so it can add it to its list
-        user_page = UserPage.new(parent, user_manager, parent.hash).grid(:row => 0, :column=> 0)
-        user_page.bind('Destroy', proc{ |w|
-          if w == user_page
-            outer_self.grid(:row => 0, :column => 0)
+          user_entry.value = ""
+          pass_entry.value = ""
+          email_entry.value = ""
+
+          popup = TkToplevel.new(root) { title "Sign-up" }
+          label = TkLabel.new(popup) do
+            text "Sign Up Successful, log in on login page!"
+            pack padx: 20, pady: 20
           end
-        }, "%W")
+        else
+          popup = TkToplevel.new(root) { title "Sign-up" }
+          label = TkLabel.new(popup) do
+            text "Sign Up failed, try again!"
+            pack padx: 20, pady: 20
+          end
+        end
+
       end
     end
     # Pack the frame itself
