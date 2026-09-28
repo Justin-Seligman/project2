@@ -24,6 +24,8 @@ class Post
             @attachments << attachment
         else
             #throw error, too many attachments
+            puts "ERROR: too many attachments (attempted to addAttachment to post with more than 5 attachments)"
+        end
     end
     
     def removeAttachment(attachmentId)
