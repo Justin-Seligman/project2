@@ -3,11 +3,9 @@ require 'tkextlib/tile'
 require_relative "../user"
 require_relative "../post"
 require_relative "../attachment"
+require_relative "user_profile"
 
-# TODO: Profile pictures
 # TODO: address needs to all be there if it wants to be saved
-# Add ability to add/remove attachments to posts.
-# Validate post attachments. (Should be done in post class?)
 
 
 
@@ -32,6 +30,30 @@ class UserPage < TkFrame
 
       command do
         outer_self.destroy
+      end
+    end
+
+    # =========================
+    # Profile
+    # =========================
+
+    # View profile page
+    TkButton.new(self) do
+      text 'View Profile'
+      grid(:row => 0, :column => 1)
+
+      command do
+        outer_self.open_profile_page
+      end
+    end
+
+    # Set profile picture
+    TkButton.new(self) do
+      text 'Set Profile Picture'
+      grid(:row => 0, :column => 2)
+
+      command do
+        outer_self.set_profile_picture
       end
     end
 
@@ -137,6 +159,55 @@ class UserPage < TkFrame
 
     # Put the whole UserPage on the parent
     grid(:row => 0, :column => 0)
+  end
+
+  # =========================
+  # Open Profile Page
+  # =========================
+
+  # Hides this page and shows the UserProfile page in its place.
+  # When the profile page is destroyed (back button) this page is shown again.
+  def open_profile_page
+    outer_self = self
+    parent = TkWinfo.parent(self)
+
+    grid_forget()
+    profile_page = UserProfile.new(parent, @user_manager, @user_id).grid(:row => 0, :column => 0)
+    profile_page.bind('Destroy') do |e|
+      if e.widget == profile_page
+        outer_self.grid(:row => 0, :column => 0)
+      end
+    end
+  end
+
+  # =========================
+  # Set Profile Picture
+  # return true/false based on success
+  # =========================
+
+  def set_profile_picture
+    # open file dialog, only png and gif can be displayed by Tk
+    filepath = Tk::getOpenFile(
+      'title' => 'Choose Profile Picture',
+      'filetypes' => "{{Image Files} {.png .gif}} {{All Files} *}"
+    )
+
+    # user cancelled the dialog
+    return false if filepath.nil? || filepath.empty?
+
+    # input validation, must be an existing png or gif file
+    if File.file?(filepath) && filepath =~ /\.(png|gif)\z/i
+      @user.profile_picture = filepath
+      return true
+    else
+      popup = TkToplevel.new(root) { title "invalid profile picture" }
+      label = TkLabel.new(popup) do
+        text "ERROR: profile picture must be a .png or .gif file!"
+        pack padx: 20, pady: 20
+      end
+      puts "ERROR: invalid profile picture file: #{filepath}"
+      return false
+    end
   end
 
   # =========================
@@ -258,6 +329,11 @@ class UserPage < TkFrame
       grid(:row => 1, :column => 1)
     end
 
+    TkLabel.new(@post_frame) do
+      text "Attachments"
+      grid(:row => 1, :column => 2)
+    end
+
     # Posts
     @user.posts.each.with_index(2) do |post, index|
       create_post_row(post, index)
@@ -283,10 +359,17 @@ class UserPage < TkFrame
       grid(:row => index, :column => 1)
     end
 
+    # Attachments (file names, or "None")
+    attachment_names = post.attachmentsNamesArray
+    TkLabel.new(@post_frame) do
+      text(attachment_names.empty? ? "None" : attachment_names.join(", "))
+      grid(:row => index, :column => 2)
+    end
+
     # Delete
     TkButton.new(@post_frame) do
       text "Delete"
-      grid(:row => index, :column => 2)
+      grid(:row => index, :column => 3)
 
       command do
         outer_self.instance_variable_get(:@user).delete_post(post.post_id)
@@ -297,7 +380,7 @@ class UserPage < TkFrame
     # Edit
     TkButton.new(@post_frame) do
       text "Edit"
-      grid(:row => index, :column => 3)
+      grid(:row => index, :column => 4)
 
       command do
         outer_self.edit_post_popup(post)
@@ -307,10 +390,114 @@ class UserPage < TkFrame
     # Add attachment
     TkButton.new(@post_frame) do
       text "Add Attachment"
-      grid(:row => index, :column => 4)
+      grid(:row => index, :column => 5)
 
       command do
         outer_self.add_attachment(post)
+      end
+    end
+
+    # Remove attachment
+    TkButton.new(@post_frame) do
+      text "Remove Attachment"
+      grid(:row => index, :column => 6)
+
+      command do
+        outer_self.remove_attachment_popup(post)
+      end
+    end
+  end
+
+  # =========================
+  # Add Attachment
+  # return true/false based on success
+  # =========================
+
+  def add_attachment(post)
+    filepath = Tk::getOpenFile('title' => 'Choose Attachment') # open file dialog
+
+    # user cancelled the dialog
+    return false if filepath.nil? || filepath.empty?
+
+    # input validation, must be an existing file
+    if !File.file?(filepath)
+      popup = TkToplevel.new(root) { title "invalid attachment" }
+      label = TkLabel.new(popup) do
+        text "ERROR: attachment file does not exist!"
+        pack padx: 20, pady: 20
+      end
+      puts "ERROR: attachment file does not exist: #{filepath}"
+      return false
+    end
+
+    attachment = Attachment.new(
+      File.basename(filepath),                  # fileName
+      File.extname(filepath).delete_prefix("."), # fileType (extension without the dot)
+      File.size(filepath),                      # fileSize in bytes
+      filepath                                  # filePath
+    )
+
+    # Post#add_attachment enforces the 5 attachment limit
+    if post.add_attachment(attachment)
+      update_posts
+      return true
+    else
+      popup = TkToplevel.new(root) { title "too many attachments" }
+      label = TkLabel.new(popup) do
+        text "ERROR: a post can have at most 5 attachments!"
+        pack padx: 20, pady: 20
+      end
+      return false
+    end
+  end
+
+  # =========================
+  # Remove Attachment Popup
+  # =========================
+
+  def remove_attachment_popup(post)
+    popup = TkToplevel.new(root)
+    popup.title("Remove Attachment")
+    popup.geometry("300x250")
+
+    TkLabel.new(popup) do
+      text "Select an attachment to remove:"
+      pack(
+        'anchor' => 'w',
+        'padx' => 10,
+        'pady' => 5
+      )
+    end
+
+    attachment_list = TkListbox.new(popup)
+    attachment_list.pack(
+      'fill' => 'both',
+      'expand' => true,
+      'padx' => 10,
+      'pady' => 2
+    )
+
+    post.attachments.each do |attachment|
+      attachment_list.insert('end', "#{attachment.attachmentId} | #{attachment.fileName}")
+    end
+
+    outer_self = self
+
+    TkButton.new(popup) do
+      text "Remove"
+      pack('pady' => 10)
+
+      command do
+        selected = attachment_list.curselection
+
+        if !selected.empty?
+          # each row is "attachmentId | fileName", so the id is before the "|"
+          attachment_id = attachment_list.get(selected[0]).split('|').first.to_i
+          post.removeAttachment(attachment_id)
+
+          popup.destroy
+          outer_self.update_posts
+        end
       end
     end
   end
@@ -375,14 +562,4 @@ class UserPage < TkFrame
       end
     end
   end
-end
-
-
-# =========================
-# Add Attachment
-# return true/false based on success
-# =========================
-def add_attachment(post)
-  filepath = Tk::getOpenFile # open file dialog
-  puts filepath
 end

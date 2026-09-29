@@ -3,7 +3,7 @@ require_relative "post"
 require_relative "address"
 
 class User
-	attr_accessor :username, :email, :posts, :address
+	attr_accessor :username, :email, :posts, :address, :profile_picture
 	attr_reader :user_id  # ID needs to be read by user_manager
 	@@next_id = 1
 	@@current_users = 0
@@ -17,7 +17,8 @@ class User
 		@logged_in = 0
 		@posts = []
 		@address = Address.new("", "", "", "")
-	end 
+		@profile_picture = ""  # filepath to the user's profile picture, empty string if not set
+	end
 
 	def login(email, password)
 		return false if email != @email || Digest::SHA256.hexdigest(password) != @password

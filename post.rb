@@ -34,7 +34,7 @@ class Post
     end
     
     def removeAttachment(attachmentId)
-        @attachments.reject{|x| x.attachmentId == attachmentId}
+        @attachments = @attachments.reject{|x| x.attachmentId == attachmentId}
     end
 
     def attachmentsNamesArray
