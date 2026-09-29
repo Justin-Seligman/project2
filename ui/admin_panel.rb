@@ -5,7 +5,7 @@ require_relative "reports/post_report"
 require_relative "reports/user_report"
 
 
-# TODO: Validate input when managing users - check with Nolan to see if login functions can be reused
+
 # TODO: implement recent post/user created
 # TODO: Update dashboard look
 # TODO: Confirm all parameters are valid when merging with backend
@@ -255,7 +255,9 @@ class AdminPanel < TkFrame
                     password_value
                 )
 
-                success = @user_manager.create_user(user)
+                # attempt to create new user if inputs are valid
+                success = User.valid_user_details?(username_value, email_value, password_value) &&
+                 @user_manager.create_user(user)
                 
 
                 status.configure(
