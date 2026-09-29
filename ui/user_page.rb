@@ -256,8 +256,8 @@ class UserPage < TkFrame
       pack('pady' => 10)
 
       command do
-        if title_entry.value ~= /\A.+\z/ &&
-          content_entry.value ~= /\A.+\z/
+        if title_entry.value =~ /\A.+\z/ &&
+          content_entry.value =~ /\A.+\z/
           post = Post.new(
             title_entry.value,
             content_entry.value
