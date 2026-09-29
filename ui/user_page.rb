@@ -256,15 +256,24 @@ class UserPage < TkFrame
       pack('pady' => 10)
 
       command do
-        post = Post.new(
-          title_entry.value,
-          content_entry.value
-        )
+        if title_entry.value ~= /\A.+\z/ &&
+          content_entry.value ~= /\A.+\z/
+          post = Post.new(
+            title_entry.value,
+            content_entry.value
+          )
 
-        outer_self.instance_variable_get(:@user).create_post(post)
+          outer_self.instance_variable_get(:@user).create_post(post)
 
-        popup.destroy
-        outer_self.update_posts
+          popup.destroy
+          outer_self.update_posts
+        else
+          popup = TkToplevel.new(root) { title "invalid post" }
+          label = TkLabel.new(popup) do
+            text "ERROR: title and content must not be empty!"
+            pack padx: 20, pady: 20
+          end
+        end
       end
     end
   end
