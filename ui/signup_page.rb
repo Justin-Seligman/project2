@@ -31,7 +31,7 @@ class SignupPageFrame < TkFrame
     pass_label = TkLabel.new(self) { text 'Password'}.grid(:row => 4, :column=> 0,:columnspan => 2)
     pass_entry = TkEntry.new(self) { show '*'}.grid(:row => 5, :column=> 0,:columnspan => 2)
 
-    # TODO: Check if username/password is empty before allowing sign up
+
 
     signup_btn = TkButton.new(self) do
       text 'sign up'
@@ -40,8 +40,11 @@ class SignupPageFrame < TkFrame
         username = user_entry.value
         password = pass_entry.value
         email = email_entry.value
+
+  
         user = User.new(username, email, password)
-        if user_manager.create_user(user)
+        if User.valid_user_details?(username, email, password) && # Shortcut evaluation, if not valid input doesn't create user
+           user_manager.create_user(user) 
           puts "signing up with email: #{email} username: #{username} password: #{password}"
 
           user_entry.value = ""

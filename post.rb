@@ -21,17 +21,20 @@ class Post
         @updatedAt = Time.now
     end
 
-    def addAttachment(attachment)
-        if @attachments.length <= 5
+    # adds attachment to post, returns true/false based on success
+    def add_attachment(attachment)
+        if @attachments.length < 5
             @attachments << attachment
+            return true
         else
             #throw error, too many attachments
             puts "ERROR: too many attachments (attempted to addAttachment to post with more than 5 attachments)"
+            return false
         end
     end
     
     def removeAttachment(attachmentId)
-        @attachments.reject{|x| x.attachmentId = attachmentId}
+        @attachments.reject{|x| x.attachmentId == attachmentId}
     end
 
     def attachmentsNamesArray

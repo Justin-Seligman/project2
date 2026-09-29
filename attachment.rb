@@ -10,4 +10,5 @@ class Attachment
         @fileSize = fileSize
         @filePath = filePath
         @uploadedAt = Time.now
+    end
 end

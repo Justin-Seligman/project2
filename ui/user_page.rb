@@ -2,6 +2,7 @@ require 'tk'
 require 'tkextlib/tile'
 require_relative "../user"
 require_relative "../post"
+require_relative "../attachment"
 
 # TODO: Profile pictures
 # TODO: address needs to all be there if it wants to be saved
@@ -80,10 +81,29 @@ class UserPage < TkFrame
       grid(:row => 2, :column => 0)
 
       command do
-        user.address.street = street_entry.value
-        user.address.city = city_entry.value
-        user.address.state = state_entry.value
-        user.address.zipCode = zipcode_entry.value
+
+        # input validation for address fields (each field should have 1 or more characters)
+        if street_entry.value =~ /\A.*\z/ && # 1 or more characters in street name
+          city_entry.value =~ /\A.*\z/ && # 1 or more characters in city name
+          state_entry.value =~ /\A[[:alpha:]]*\z/ && # 1 or more letters in state name
+          zipcode_entry.value =~ /\A([0-9]{5}|[0-9]{5}\-[0-9]{4})\z/ # zip code either 5 number or 5+4 number format
+          
+
+          user.address.street = street_entry.value
+          user.address.city = city_entry.value
+          user.address.state = state_entry.value
+          user.address.zipCode = zipcode_entry.value
+
+          
+        else
+          # otherwise address input is not valid, display error popup
+          popup = TkToplevel.new(root) { title "invalid address" }
+          label = TkLabel.new(popup) do
+            text "ERROR: invalid address field(s)!"
+            pack padx: 20, pady: 20
+          end
+          puts "ERROR: invalid input for address"
+        end
       end
     end
 
@@ -126,7 +146,7 @@ class UserPage < TkFrame
   def create_post_popup
     popup = TkToplevel.new(root)
     popup.title("Create Post")
-    popup.geometry("300x180")
+    popup.geometry("450x350")
 
     TkLabel.new(popup) do
       text "Title:"
@@ -160,7 +180,10 @@ class UserPage < TkFrame
       'pady' => 2
     )
 
+  
+
     outer_self = self
+
 
     TkButton.new(popup) do
       text "Submit"
@@ -280,6 +303,16 @@ class UserPage < TkFrame
         outer_self.edit_post_popup(post)
       end
     end
+
+    # Add attachment
+    TkButton.new(@post_frame) do
+      text "Add Attachment"
+      grid(:row => index, :column => 4)
+
+      command do
+        outer_self.add_attachment(post)
+      end
+    end
   end
 
   # =========================
@@ -342,4 +375,14 @@ class UserPage < TkFrame
       end
     end
   end
+end
+
+
+# =========================
+# Add Attachment
+# return true/false based on success
+# =========================
+def add_attachment(post)
+  filepath = Tk::getOpenFile # open file dialog
+  puts filepath
 end

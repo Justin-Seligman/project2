@@ -22,7 +22,7 @@ class LoginPageFrame < TkFrame
     pass_label = TkLabel.new(self) { text 'Password'}.grid(:row => 2, :column=> 0,:columnspan => 2)
     pass_entry = TkEntry.new(self) { show '*'}.grid(:row => 3, :column=> 0,:columnspan => 2)
 
-    # TODO: Check if username/password is empty before allowing sign in/up
+
 
     login_btn = TkButton.new(self) do
       text 'log in'
@@ -30,9 +30,11 @@ class LoginPageFrame < TkFrame
       command do
         email = email_entry.value
         password = pass_entry.value
+
+
         # Add authentication logic here
         user_id = user_manager.attempt_login(email, password)
-        if user_id != false
+        if User.valid_user_details?(nil, email, password) && user_id != false
           outer_self.grid_forget()
           user_page = UserPage.new(parent, user_manager, user_id).grid(:row => 0, :column=> 0)
           user_page.bind('Destroy') do |e|
