@@ -68,4 +68,22 @@ class UserManager
 	def deleted_user_count
 		@@deleted_users
 	end
+
+	# returns the most recently registered users, newest first
+	# (IDs are handed out in order, so a higher ID means registered later)
+	def recent_users(count)
+		@users.values.sort_by { |user| user.user_id }.reverse.first(count)
+	end
+
+	# returns the most recently created posts, newest first,
+	# as [user, post] pairs so the poster is known
+	def recent_posts(count)
+		pairs = []
+		@users.values.each do |user|
+			user.posts.each do |post|
+				pairs << [user, post]
+			end
+		end
+		pairs.sort_by { |user, post| post.createdAt }.reverse.first(count)
+	end
 end

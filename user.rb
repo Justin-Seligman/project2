@@ -33,6 +33,11 @@ class User
 		@@current_users -= 1
 	end
 
+	# replaces the user's password, stored hashed the same way as in initialize
+	def set_password(password)
+		@password = Digest::SHA256.hexdigest(password)
+	end
+
   	def create_post(post)
     	@posts << post
   	end

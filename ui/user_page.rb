@@ -5,9 +5,6 @@ require_relative "../post"
 require_relative "../attachment"
 require_relative "user_profile"
 
-# TODO: address needs to all be there if it wants to be saved
-
-
 
 class UserPage < TkFrame
   def initialize(parent, user_manager, user_id)

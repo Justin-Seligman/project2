@@ -3,10 +3,10 @@ require_relative "../user_manager"
 require_relative "reports/master_report"
 require_relative "reports/post_report"
 require_relative "reports/user_report"
+require_relative "user_profile"
 
 
 
-# TODO: implement recent post/user created
 # TODO: Update dashboard look
 # TODO: Confirm all parameters are valid when merging with backend
 # TODO: need to know the admin that's "logged in" for the master report?
@@ -322,9 +322,114 @@ class AdminPanel < TkFrame
         ).grid(
             row: 5,
             column: 0,
-            columnspan: 2,
             pady: 5
         )
+
+
+        # Update Selected User
+        # Fills in the selected user's details from the fields above.
+        # Empty fields keep the user's current value.
+        TkButton.new(
+            window,
+            text: "Update Selected User",
+            command: proc {
+
+                selected = user_list.curselection
+
+
+                if selected.empty?
+
+                    status.configure(
+                        text: "Select a user to update."
+                    )
+
+                else
+
+                    selected_value = user_list.get(selected[0])
+
+                    user_id = selected_value.split('|').first.to_i
+
+                    user = @user_manager.get_user_by_id(user_id)
+
+
+                    # nil means "don't change", valid_user_details? skips nil arguments
+                    username_value = username_field.get.to_s.strip
+                    email_value = email_field.get.to_s.strip
+                    password_value = password_field.get.to_s
+
+                    username_value = nil if username_value.empty?
+                    email_value = nil if email_value.empty?
+                    password_value = nil if password_value.empty?
+
+
+                    # the new email can't belong to a different user
+                    other_user = email_value ? @user_manager.get_user_by_email(email_value) : nil
+                    email_taken = other_user && other_user.user_id != user_id
+
+
+                    if user && !email_taken &&
+                       User.valid_user_details?(username_value, email_value, password_value)
+
+                        user.username = username_value if username_value
+                        user.email = email_value if email_value
+                        user.set_password(password_value) if password_value
+
+                        @user_manager.update_user(user)
+
+
+                        status.configure(
+                            text: "Updated user #{user_id}"
+                        )
+
+
+                        # Clear fields
+                        username_field.delete(0, 'end')
+                        email_field.delete(0, 'end')
+                        password_field.delete(0, 'end')
+
+
+                        # Refresh list
+                        refresh_user_list(user_list)
+
+                    else
+
+                        status.configure(
+                            text: email_taken ?
+                                "Update failed, email already in use." :
+                                "Update failed, invalid input."
+                        )
+
+                    end
+                end
+            }
+        ).grid(
+            row: 5,
+            column: 1,
+            pady: 5
+        )
+
+
+        # Clicking a user in the list fills in their username and email
+        # so they can be edited and saved with "Update Selected User"
+        user_list.bind('<ListboxSelect>') do
+
+            selected = user_list.curselection
+
+            if !selected.empty?
+
+                user_id = user_list.get(selected[0]).split('|').first.to_i
+
+                user = @user_manager.get_user_by_id(user_id)
+
+                if user
+                    username_field.delete(0, 'end')
+                    username_field.insert(0, user.username)
+
+                    email_field.delete(0, 'end')
+                    email_field.insert(0, user.email)
+                end
+            end
+        end
 
 
         # Users label
@@ -484,6 +589,42 @@ class AdminPanel < TkFrame
             pady: 10
         )
 
+        # View profile of selected user
+        TkButton.new(
+            window,
+            text: "View Profile for Selected User",
+            anchor: "w",
+            command: proc {
+                selected = results.curselection
+
+
+                if selected.empty?
+
+                    status.configure(
+                        text: "Select a user to view."
+                    )
+
+                else
+
+                    selected_value = results.get(selected[0])
+
+                    user_id = selected_value.split('|').first.to_i
+
+                    open_profile_window(user_id)
+
+                    status.configure(
+                        text: "Viewing profile for #{user_id}"
+                    )
+
+                end
+            }
+        ).grid(
+            row: 1,
+            column: 1,
+            padx: 10,
+            pady: 10
+        )
+
         # Search button
         TkButton.new(
             window,
@@ -565,6 +706,23 @@ class AdminPanel < TkFrame
     end
 
 
+    # Opens the same profile page a user sees (UserProfile) in its own window
+    def open_profile_window(user_id)
+        window = TkToplevel.new(self)
+        window.title = "User Profile"
+
+        profile = UserProfile.new(window, @user_manager, user_id)
+
+        # the profile's Back button destroys the profile page,
+        # so close the window along with it
+        profile.bind('Destroy') do |e|
+            if e.widget == profile && TkWinfo.exist?(window)
+                window.destroy
+            end
+        end
+    end
+
+
     def refresh_user_list(listbox)
 
         listbox.delete(
@@ -642,9 +800,18 @@ class AdminPanel < TkFrame
         # Right column
         # -------------------------
 
+        # 3 most recently registered users
+        recent_users_text = "Recently Registered Users:"
+
+        @user_manager.recent_users(3).each do |user|
+            recent_users_text += "\n#{user.user_id} | #{user.username} | #{user.email}"
+        end
+
+        recent_users_text += "\nNone" if @user_manager.user_count == 0
+
         recent_registered_user = TextBox.new(
             window,
-            "Recently Registered User: #{3}"
+            recent_users_text
         )
 
         recent_registered_user.grid(
@@ -656,9 +823,20 @@ class AdminPanel < TkFrame
         )
 
 
+        # 3 most recently created posts
+        recent_posts = @user_manager.recent_posts(3)
+
+        recent_posts_text = "Recently Created Posts:"
+
+        recent_posts.each do |user, post|
+            recent_posts_text += "\n#{user.username} -> #{post.title} (#{post.createdAt.strftime('%m/%d %H:%M')})"
+        end
+
+        recent_posts_text += "\nNone" if recent_posts.empty?
+
         recent_created_post = TextBox.new(
             window,
-            "Recently Created Post: #{3}"
+            recent_posts_text
         )
 
         recent_created_post.grid(
