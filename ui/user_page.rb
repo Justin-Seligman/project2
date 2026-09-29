@@ -121,7 +121,6 @@ class UserPage < TkFrame
             text "ERROR: invalid address field(s)!"
             pack padx: 20, pady: 20
           end
-          puts "ERROR: invalid input for address"
         end
       end
     end
@@ -202,7 +201,6 @@ class UserPage < TkFrame
         text "ERROR: profile picture must be a .png or .gif file!"
         pack padx: 20, pady: 20
       end
-      puts "ERROR: invalid profile picture file: #{filepath}"
       return false
     end
   end
@@ -423,7 +421,6 @@ class UserPage < TkFrame
         text "ERROR: attachment file does not exist!"
         pack padx: 20, pady: 20
       end
-      puts "ERROR: attachment file does not exist: #{filepath}"
       return false
     end
 

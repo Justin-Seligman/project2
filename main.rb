@@ -8,7 +8,7 @@ require_relative 'ui/signup_page'
 require_relative 'ui/admin_panel'
 
 if __FILE__ == $0
-  root = TkRoot.new { title "Modular Ruby/Tk App" }
+  root = TkRoot.new { title "UserHub app" }
   root.geometry("1000x300")
   nb = Tk::Tile::Notebook.new(root) do
     place('x' => 0, 'y' => 0)

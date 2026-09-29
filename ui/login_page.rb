@@ -32,7 +32,6 @@ class LoginPageFrame < TkFrame
         password = pass_entry.value
 
 
-        # Add authentication logic here
         user_id = user_manager.attempt_login(email, password)
         if User.valid_user_details?(nil, email, password) && user_id != false
           outer_self.grid_forget()

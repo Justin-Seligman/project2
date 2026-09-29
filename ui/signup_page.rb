@@ -5,7 +5,6 @@ require_relative 'user_page'
 require_relative '../user_manager'
 require_relative 'login_page'
 
-# TODO: Make Address field pop-up
 
 class SignupPageFrame < TkFrame
 
@@ -45,7 +44,6 @@ class SignupPageFrame < TkFrame
         user = User.new(username, email, password)
         if User.valid_user_details?(username, email, password) && # Shortcut evaluation, if not valid input doesn't create user
            user_manager.create_user(user) 
-          puts "signing up with email: #{email} username: #{username} password: #{password}"
 
           user_entry.value = ""
           pass_entry.value = ""

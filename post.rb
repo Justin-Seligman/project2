@@ -27,8 +27,7 @@ class Post
             @attachments << attachment
             return true
         else
-            #throw error, too many attachments
-            puts "ERROR: too many attachments (attempted to addAttachment to post with more than 5 attachments)"
+            # throw error, too many attachments
             return false
         end
     end

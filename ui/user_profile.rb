@@ -177,7 +177,6 @@ class UserProfile < TkFrame
       @profile_image = image
       @picture_label.configure(:image => @profile_image)
     rescue => e
-      puts "ERROR: could not load profile picture #{filepath}: #{e.message}"
       @picture_label.configure(:text => "Could not load picture")
     end
   end
